@@ -1,0 +1,22 @@
+(class A
+  (properties
+    :a
+    :b)
+
+  (functions
+    (product (lambda (self) (* (A:get-a self) (A:get-b self))))
+    (sum     (lambda (self) (+ (A:get-a self) (A:get-b self))))))
+
+(class B
+  (properties
+    :a
+    :b)
+
+  (functions
+    (product (lambda (self) (* (B:get-a self) (B:get-b self) 2)))))
+
+(inherits A B)
+
+(define instance (B :a 12 :b 2))
+(write (B:product instance))
+(write (B:sum     instance))

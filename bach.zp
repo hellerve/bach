@@ -1,0 +1,47 @@
+(define-syntax class
+  (syntax-rules (properties functions)
+    ((_ name (properties props ...) (functions funs ...))
+      (with-environment env
+        (begin
+          (eval
+            (macro-expand
+              (list 'defkeywords (list 'name) (list:flatten 'props)
+                  (cons 'make-hash
+                      (list:flatten
+                        (map ($ (if (list? %) (list (car %) (atom->symbol (car %)))
+                                              (list % (atom->symbol %)))) 'props)))))
+            env)
+          (map ($ (let ((% (if (list? %) (car %) %)))
+                    (eval
+                        `(define (,(string->symbol (++ (->string 'name) ":get-"
+                                                       (->string (atom->symbol %)))) self)
+                                 (self ,%)) env)))
+               'props)
+          (map ($ (let ((% (if (list? %) (car %) %)))
+                    (eval
+                        `(define (,(string->symbol (++ (->string 'name) ":set-"
+                                                       (->string (atom->symbol %)))) self val)
+                          (hash:set self ,% val)) env)))
+               'props)
+          (map ($ (eval `(define ,(string->symbol (++ (->string 'name) ":" (->string (car %))))
+                                 ,(cadr %))
+                        env))
+               'funs))))))
+
+(define-syntax inherits
+  (syntax-rules ()
+    ((_ parent child)
+      (with-environment env
+        (let* ((funs (env->hashmap env))
+               (names (hash:keys funs))
+               (parent-funs (filter ($ (string:starts-with % (++ (->string 'parent) ":")))
+                                    names))
+               (child-funs (filter ($ (string:starts-with % (++ (->string 'child) ":")))
+                                   names)))
+          (map (lambda (parent-fun)
+                 (let ((nfun (string:substitute parent-fun (->string 'parent) (->string 'child))))
+                  (if (not (in? child-funs nfun))
+                    (eval `(define ,(string->symbol nfun)
+                                   ,(funs parent-fun))
+                          env))))
+               parent-funs))))))
