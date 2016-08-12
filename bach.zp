@@ -11,6 +11,8 @@
                         (map ($ (if (list? %) (list (car %) (atom->symbol (car %)))
                                               (list % (atom->symbol %)))) 'props)))))
             env)
+          (eval `(define (,(->symbol name "?") obj) (eq? (hash:keys obj) (quote ,'props))) env)
+          (eval `(define (,(->symbol name ":get-properties")) (quote ,'props)) env)
           (map ($ (let ((% (if (list? %) (car %) %)))
                     (eval
                         `(define (,(string->symbol (++ (->string 'name) ":get-"

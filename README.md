@@ -39,6 +39,8 @@ This will generate the following functions:
 (Person:->string joe) ; => "Joe, age 24"
 (Person:->string (Person:set-name joe "Tina")) ; => "Tina, age 24"
 (Person:->string (Person:set-age joe 30)) ; => "Joe, age 30"
+(Person? joe) ; => true
+(Person:get-properties) ; => [:name, :age]
 ```
 
 You can also inherit methods (but not properties!) from other classes:
