@@ -27,7 +27,7 @@ A class could look like so:
     (:age :default 0))
 
   (functions
-    (->string (lambda (self) (++ (Person:get-name self) ", age " (->string (Person:get-age self))))))(
+    (->string (lambda (self) (++ (Person:get-name self) ", age " (->string (Person:get-age self)))))))
 ```
 
 This will generate the following functions:
